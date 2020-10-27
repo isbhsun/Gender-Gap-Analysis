@@ -1,3 +1,8 @@
+import requests
+from pymongo import MongoClient
+from bs4 import BeautifulSoup
+import pandas as pd
+
 def html_to_collection(collection, page):
     
     doc = collection.find_one({'page': page })    
@@ -10,7 +15,7 @@ def html_to_collection(collection, page):
         url = wik + page
         r = requests.get(url)
         collection.insert_one({'page': page, 
-                               'html':r.content})
+                               'html': r.content})
         print(f"{page}: I saved the html")
         
     return None 
@@ -46,7 +51,7 @@ def people_to_collection(collection, page):
                                                          }})
         except: 
             print(f"{page} oh no i couldn't find people")
-        return None
+    return None
 
 
 def find_subcategories(collection, page):
@@ -54,7 +59,7 @@ def find_subcategories(collection, page):
     doc = collection.find_one({'page': page })
     
     try:
-        doc['subcat_name']
+        doc['subcat_link']
         print(f"{page} subcategories already here!")
     
     except:
@@ -68,17 +73,11 @@ def find_subcategories(collection, page):
                 subcat_link.append(link['href'])
             print(f"{page}: i added a subcategory link")
 
-            subcat_name = []
-            for link in div.find_all('a'):
-                subcat_name.append(link['title'])
-            print(f"{page}: i added a subcategory name")
+            collection.update_one({'page': page },{"$set":{ 'subcat_link': subcat_link}})
 
-            collection.update_one({'page': page },{"$set":{'subcat_name': subcat_name,
-                                                          'subcat_link': subcat_link
-                                                         }})
         except:
             print(f"{page}: I have no subcategories")
-        return None
+    return None
         
 
 
@@ -136,7 +135,31 @@ def subcat_html_to_collection(collection, page):
 
     except:
         print(f"{page} I don't have subcategories or they are already added")
+    
+    return None
 
+
+
+def write_subcategories_to_set(collection, subcategory_set):
+    
+    wik = 'https://en.wikipedia.org/'
+    
+    num_subcategories_added = 0
+    for doc in collection.find():
+        try:
+            for i in doc['subcat_link']:
+                url = wik + i
+                r = requests.get(url)
+                subcat_page = i.replace('/wiki/Category:', '')
+
+                if subcat_page in subcategory_set:
+                    continue
+                elif subcat_page not in subcategory_set:
+                    subcategory_set.add(subcat_page)
+                    num_subcategories_added += 1 
+        except:
+            continue 
+    return num_subcategories_added
 
 
 def count_gendered_words(collection, person):
@@ -178,7 +201,7 @@ def count_gendered_words(collection, person):
     
     return None
 
-    
+
 def people_html_to_collection(col_from, page, col_to):
     doc = col_from.find_one({'page': page })
     links = doc['list_name_links']
@@ -196,8 +219,8 @@ def people_html_to_collection(col_from, page, col_to):
             url =  wik + link
             r = requests.get(url)
             col_to.insert_one({'page': name, 
-                               'field': page
-                                'html':r.content})
+                               'field': page,
+                                'html': r.content})
             print(f"{name}: I saved the html")
             
         try:
