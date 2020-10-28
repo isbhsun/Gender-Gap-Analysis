@@ -166,38 +166,33 @@ def count_gendered_words(collection, person):
     
     doc = collection.find_one({'page': person })
     
-    # try:
-    #     doc['count_female_words']
-    #     # print(f"{person}: words already counted")
+    try:
+        doc['count_female_words']
+        # print(f"{person}: words already counted")
     
-    # except: 
+    except: 
         
-    str_body_text = doc['body_text']
-    str_body_text_2 = str(str_body_text).lower()
-    
-    years = re.findall('d\d\d\d?', str_body_text)
-    list_words_in_body = str_body_text.split(' ')
-    dct_word_counter = Counter(list_words_in_body)
-    
-    if 'phd' in dct_word_counter:
+        str_body_text = doc['body_text']
+        str_body_text_2 = str(str_body_text).lower()
+        
+        years = re.findall('\d\d\d\dD?', str_body_text)
+        list_words_in_body = str_body_text.split(' ')
+        dct_word_counter = Counter(list_words_in_body)
+        
         doctorate = dct_word_counter['phd']
-    else:
-        doctorate = 0
+        count_female_words = dct_word_counter['she'] + dct_word_counter['her'] +dct_word_counter['hers']
+        count_male_words = dct_word_counter['he'] + dct_word_counter['him'] + dct_word_counter['his']
+        count_nonbinary_words = dct_word_counter['they'] + dct_word_counter['them'] + dct_word_counter['theirs'] + dct_word_counter['ze'] + dct_word_counter['zir'] + dct_word_counter['hir']
 
-    count_female_words = dct_word_counter['she'] + dct_word_counter['her'] +dct_word_counter['hers']
-    count_male_words = dct_word_counter['he'] + dct_word_counter['him'] + dct_word_counter['his']
-    count_nonbinary_words = dct_word_counter['they'] + dct_word_counter['them'] + dct_word_counter['theirs'] + dct_word_counter['ze'] + dct_word_counter['zir'] + dct_word_counter['hir']
-    
-    
-
-    collection.update_one({'page': person },{"$set":{'count_female_words': count_female_words, 
-                                                    'count_male_words': count_male_words,
-                                                    'count_nonbinary_words': count_nonbinary_words,
-                                                    'len_page': len(list_words_in_body),
-                                                    'years': years,
-                                                    'doctorate': doctorate}})
+        collection.update_one({'page': person },{"$set":{'count_female_words': count_female_words, 
+                                                        'count_male_words': count_male_words,
+                                                        'count_nonbinary_words': count_nonbinary_words,
+                                                        'len_page': len(list_words_in_body),
+                                                        'years': years,
+                                                        'doctorate': doctorate}})
 
     return None
+
 
 
 def people_html_to_collection(col_from, page, col_to):
@@ -236,21 +231,21 @@ def just_body_text(collection, person):
     
     doc = collection.find_one({'page': person })
     
-    # try:
-    #     doc['body_text']
+    try:
+        doc['body_text']
 
-    # except: 
+    except: 
     
-    soup = BeautifulSoup(doc['html'], 'html.parser')
-    div = soup.find("div", {'id':'bodyContent'})
+        soup = BeautifulSoup(doc['html'], 'html.parser')
+        div = soup.find("div", {'id':'bodyContent'})
 
-    body = str(div)
-    body_text = re.sub('<[^>]+>', '', body)
+        body = str(div)
+        body_text = re.sub('<[^>]+>', '', body)
 
-    punct = string.punctuation
-    for char in punct:
-        body_text = body_text.replace(char, ' ')
-    body_text = body_text.replace('\n', ' ')
+        punct = string.punctuation
+        for char in punct:
+            body_text = body_text.replace(char, ' ')
+        body_text = body_text.replace('\n', ' ')
 
-    collection.update_one({'page': person },{"$set":{'body_text': body_text}})
+        collection.update_one({'page': person },{"$set":{'body_text': body_text}})
     return None
