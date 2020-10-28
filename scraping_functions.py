@@ -2,6 +2,9 @@ import requests
 from pymongo import MongoClient
 from bs4 import BeautifulSoup
 import pandas as pd
+import re
+import string 
+from collections import Counter
 
 def html_to_collection(collection, page):
     
@@ -16,7 +19,7 @@ def html_to_collection(collection, page):
         r = requests.get(url)
         collection.insert_one({'page': page, 
                                'html': r.content})
-        print(f"{page}: I saved the html")
+        # print(f"{page}: I saved the html")
         
     return None 
 
@@ -27,25 +30,22 @@ def people_to_collection(collection, page):
     
     try:
         doc['list_names']
-        print(f"{page} names already here!")
+        # print(f"{page} names already here!")
     
     except:
         try:
 
             soup = BeautifulSoup(doc['html'] ,'html.parser')
-            div = soup.find("div", {'class':'mw-category'})
+            div = soup.find("div", {'id':'mw-pages'})
 
             list_link_ext = []
+            list_names = []
+            
             for link in div.find_all('a'):
                 list_link_ext.append(link['href'])
-            print(f"{page}:i grabbed a person link!")
-
-            #grab names
-            list_names = []
-            for link in div.find_all('a'):
                 list_names.append(link['title'])
-            print(f"{page}:i grabbed a name!")
 
+            print(f"{page}:i grabbed a person and link!")
             collection.update_one({'page': page },{"$set":{'list_names': list_names,
                                                           'list_name_links': list_link_ext
                                                          }})
@@ -60,7 +60,7 @@ def find_subcategories(collection, page):
     
     try:
         doc['subcat_link']
-        print(f"{page} subcategories already here!")
+        # print(f"{page} subcategories already here!")
     
     except:
         try:
@@ -71,7 +71,7 @@ def find_subcategories(collection, page):
             subcat_link = []
             for link in div.find_all('a'):
                 subcat_link.append(link['href'])
-            print(f"{page}: i added a subcategory link")
+            # print(f"{page}: i added a subcategory link")
 
             collection.update_one({'page': page },{"$set":{ 'subcat_link': subcat_link}})
 
@@ -112,31 +112,31 @@ def find_next_page(collection, page):
     return None
 
 
-def subcat_html_to_collection(collection, page):
+# def subcat_html_to_collection(collection, page):
     
-    doc = collection.find_one({'page': page })
+#     doc = collection.find_one({'page': page })
     
-    try: 
-        subcat_link = doc['subcat_link']
-        wik = 'https://en.wikipedia.org/'
+#     try: 
+#         subcat_link = doc['subcat_link']
+#         wik = 'https://en.wikipedia.org/'
 
-        for i in subcat_link:
-            url = wik + i
-            r = requests.get(url)
-            subcat_page = i.replace('/wiki/Category:', '')
+#         for i in subcat_link:
+#             url = wik + i
+#             r = requests.get(url)
+#             subcat_page = i.replace('/wiki/Category:', '')
 
-            if subcat_page in subcategory_url:
-                print(f"{subcat_page}: subcategory html already here")
-            elif subcat_page not in subcategory_url:
-                subcategory_url.add(subcat_page)
-                collection.insert_one({'page': subcat_page, 
-                               'html':r.content})
-                print(f"{subcat_page}: I saved the subcat html")
+#             if subcat_page in subcategory_url:
+#                 print(f"{subcat_page}: subcategory html already here")
+#             elif subcat_page not in subcategory_url:
+#                 subcategory_url.add(subcat_page)
+#                 collection.insert_one({'page': subcat_page, 
+#                                'html':r.content})
+#                 print(f"{subcat_page}: I saved the subcat html")
 
-    except:
-        print(f"{page} I don't have subcategories or they are already added")
+#     except:
+#         print(f"{page} I don't have subcategories or they are already added")
     
-    return None
+#     return None
 
 
 
@@ -164,69 +164,93 @@ def write_subcategories_to_set(collection, subcategory_set):
 
 def count_gendered_words(collection, person):
     
-    doc = col_people.find_one({'page': person })
+    doc = collection.find_one({'page': person })
     
-    try:
-        doc['count_female_words']
-        print(f"{person}: words already counted")
+    # try:
+    #     doc['count_female_words']
+    #     # print(f"{person}: words already counted")
     
-    except: 
-        soup = BeautifulSoup(doc['html'], 'html.parser')
-        div = soup.find("div", {'id':'mw-content-text'})
-
-        substring_female = [' she ', ' her ']
-        substring_male = [' he ', ' his ']
-        substring_nonbinary = [' they ', ' them ', 'ze ', ' zir ', ' hir ']
-
-        count_female_words = 0
-        for word in substring_female:
-            count = str(div).lower().count(word)
-            count_female_words += count
-
-        count_male_words = 0
-        for word in substring_male:
-            count = str(div).lower().count(word)
-            count_male_words += count
-            
-        count_nonbinary_words = 0
-        for word in substring_nonbinary:
-            count = str(div).lower().count(word)
-            count_nonbinary_words += count
-
-
-        col_people.insert_one({'count_female_words': count_female_words, 
-                            'count_male_words': count_male_words,
-                            'count_nonbinary_words': count_nonbinary_words})
-        print(f"{person}: female {count_female_words}, male {count_male_words}, nonbinary {count_nonbinary_words}")
+    # except: 
+        
+    str_body_text = doc['body_text']
+    str_body_text_2 = str(str_body_text).lower()
     
+    years = re.findall('d\d\d\d?', str_body_text)
+    list_words_in_body = str_body_text.split(' ')
+    dct_word_counter = Counter(list_words_in_body)
+    
+    if 'phd' in dct_word_counter:
+        doctorate = dct_word_counter['phd']
+    else:
+        doctorate = 0
+
+    count_female_words = dct_word_counter['she'] + dct_word_counter['her'] +dct_word_counter['hers']
+    count_male_words = dct_word_counter['he'] + dct_word_counter['him'] + dct_word_counter['his']
+    count_nonbinary_words = dct_word_counter['they'] + dct_word_counter['them'] + dct_word_counter['theirs'] + dct_word_counter['ze'] + dct_word_counter['zir'] + dct_word_counter['hir']
+    
+    
+
+    collection.update_one({'page': person },{"$set":{'count_female_words': count_female_words, 
+                                                    'count_male_words': count_male_words,
+                                                    'count_nonbinary_words': count_nonbinary_words,
+                                                    'len_page': len(list_words_in_body),
+                                                    'years': years,
+                                                    'doctorate': doctorate}})
+
     return None
 
 
 def people_html_to_collection(col_from, page, col_to):
-    doc = col_from.find_one({'page': page })
-    links = doc['list_name_links']
-    names = doc['list_names']
+    
 
-    for link, name in zip(links, names):
-        doc_person = col_to.find_one({'page': name })
+    try:
+        doc = col_from.find_one({'page': page })
+        links = doc['list_name_links']
+        names = doc['list_names']
 
-        try:
-            doc_person['page']
-            print(f"{name}: page already exists!")
+        for link, name in zip(links, names):
+            doc_person = col_to.find_one({'page': name })
 
-        except:
-            wik = 'https://en.wikipedia.org'
-            url =  wik + link
-            r = requests.get(url)
-            col_to.insert_one({'page': name, 
-                               'field': page,
-                                'html': r.content})
-            print(f"{name}: I saved the html")
-            
-        try:
-            count_gendered_words(col_to, name)
-        except:
-            print("oops")
+            try:
+                doc_person['page']
 
+            except:
+                wik = 'https://en.wikipedia.org'
+                url =  wik + link
+                r = requests.get(url)
+                col_to.insert_one({'page': name, 
+                                    'field': page,
+                                    'html': r.content})
+                
+            try:
+                just_body_text(col_to, name)
+            except:
+                print(f"{page}: oops body text")
+
+    except:
+        print(f"{page}: no names" )
     return None
 
+
+def just_body_text(collection, person):
+    
+    doc = collection.find_one({'page': person })
+    
+    # try:
+    #     doc['body_text']
+
+    # except: 
+    
+    soup = BeautifulSoup(doc['html'], 'html.parser')
+    div = soup.find("div", {'id':'bodyContent'})
+
+    body = str(div)
+    body_text = re.sub('<[^>]+>', '', body)
+
+    punct = string.punctuation
+    for char in punct:
+        body_text = body_text.replace(char, ' ')
+    body_text = body_text.replace('\n', ' ')
+
+    collection.update_one({'page': person },{"$set":{'body_text': body_text}})
+    return None
