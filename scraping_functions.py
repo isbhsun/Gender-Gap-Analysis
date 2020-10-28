@@ -176,10 +176,9 @@ def count_gendered_words(collection, person):
         str_body_text_2 = str(str_body_text).lower()
         
         years = re.findall('\d\d\d\dD?', str_body_text)
-        list_words_in_body = str_body_text.split(' ')
+        list_words_in_body = str_body_text_2.split(' ')
         dct_word_counter = Counter(list_words_in_body)
         
-        doctorate = dct_word_counter['phd']
         count_female_words = dct_word_counter['she'] + dct_word_counter['her'] +dct_word_counter['hers']
         count_male_words = dct_word_counter['he'] + dct_word_counter['him'] + dct_word_counter['his']
         count_nonbinary_words = dct_word_counter['they'] + dct_word_counter['them'] + dct_word_counter['theirs'] + dct_word_counter['ze'] + dct_word_counter['zir'] + dct_word_counter['hir']
@@ -189,7 +188,7 @@ def count_gendered_words(collection, person):
                                                         'count_nonbinary_words': count_nonbinary_words,
                                                         'len_page': len(list_words_in_body),
                                                         'years': years,
-                                                        'doctorate': doctorate}})
+                                                        'word_dict': dct_word_counter}})
 
     return None
 
@@ -237,15 +236,22 @@ def just_body_text(collection, person):
     except: 
     
         soup = BeautifulSoup(doc['html'], 'html.parser')
-        div = soup.find("div", {'id':'bodyContent'})
+        div = soup.find("div", {'class':'mw-parser-output'})
 
         body = str(div)
         body_text = re.sub('<[^>]+>', '', body)
+
+        if "Ph.D" in body_text:
+            doctorate = 1
+        else:
+            doctorate = 0
 
         punct = string.punctuation
         for char in punct:
             body_text = body_text.replace(char, ' ')
         body_text = body_text.replace('\n', ' ')
+        body_text = body_text.replace('\xa0', ' ')
 
-        collection.update_one({'page': person },{"$set":{'body_text': body_text}})
+        collection.update_one({'page': person },{"$set":{'body_text': body_text,
+                                                        'doctorate': doctorate}})
     return None
