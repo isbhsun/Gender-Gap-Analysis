@@ -70,7 +70,6 @@ This figure visualizes the proportion of women in a field by Wikipedia category.
 
 
 ![alt text](images/PropPhD_gender_field.png "Title")
-<sub>** Indicates that the difference between the proportion of men and women holding PhDs is different than 0. </sub>
 
 This figure represents the proportion of women holding PhDs and the proportion of men holding PhDs. In every category where the proprtion of men holding PhDs is greater than the proportion of women holding PhDs, we would not be able to reject the null hypothesis that the difference in means is greater than 0. However, in the case of chemistry and physiology, where the proportion of women holding PhDs is greater than the proportion of men holding PhDs, the difference in means lies beyond the 95% confidence interval. This suggests that in all of these fields, women are just as, if not more qualified than men. 
 
