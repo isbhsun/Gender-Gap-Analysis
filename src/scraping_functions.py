@@ -45,7 +45,7 @@ def people_to_collection(collection, page):
                 list_link_ext.append(link['href'])
                 list_names.append(link['title'])
 
-            print(f"{page}:i grabbed a person and link!")
+            # print(f"{page}:i grabbed a person and link!")
             collection.update_one({'page': page },{"$set":{'list_names': list_names,
                                                           'list_name_links': list_link_ext
                                                          }})
@@ -81,36 +81,83 @@ def find_subcategories(collection, page):
         
 
 
-def find_next_page(collection, page):
+# def find_next_page(collection, page):
     
-    doc = collection.find_one({'page': page })
+#     doc = collection.find_one({'page': page })
     
+#     try:
+#         doc['next_page']
+#         print(f"{page}: next page already here!")
+    
+#     except:
+#         try:
+#             soup = BeautifulSoup(doc['html'] ,'html.parser')
+#             div = soup.find("div", {'id':'mw-pages'})   
+
+#             links = []
+#             for link in div.find_all('a'):
+#                 links.append(link['href'])
+
+#             last_link = links.pop()
+#             if 'pagefrom' in last_link:
+#                 collection.update_one({'page': page },{"$set":{'next_page': last_link}})
+#                 print(f"{page}:I grabbed the next page")
+#             else:
+#                 print(f"{page}:I'm already the last page")    
+        
+#         except:
+#             collection.update_one({'page': page },{"$set":{'next_page': 'only page'}})
+#             print(f"{page}: I'm the only page")
+    
+#     return None
+
+def names_on_next_page(collection, page):
+
+    doc = collection.find_one({'page':page})
+
     try:
-        doc['next_page']
-        print(f"{page}: next page already here!")
-    
+        doc['last_page']
+        #print('already looked for all the pages')
+
     except:
         try:
+            orig_names_list = doc['list_names']
+            orig_links_list = doc['list_name_links']
+
             soup = BeautifulSoup(doc['html'] ,'html.parser')
             div = soup.find("div", {'id':'mw-pages'})   
 
-            links = []
-            for link in div.find_all('a'):
-                links.append(link['href'])
+            wik = 'https://en.wikipedia.org/'
 
-            last_link = links.pop()
-            if 'pagefrom' in last_link:
-                collection.update_one({'page': page },{"$set":{'next_page': last_link}})
-                print(f"{page}:I grabbed the next page")
-            else:
-                print(f"{page}:I'm already the last page")    
-        
+            last_page = False
+            while last_page == False:
+
+                last_link = orig_links_list[-1]
+
+                if 'pagefrom' in last_link:
+
+                    orig_links_list.pop()
+
+                    ext = last_link
+                    url = wik + ext
+                    # print(f"not last {url}")
+
+                    r = requests.get(url)
+                    soup = BeautifulSoup(r.content ,'html.parser')
+                    div = soup.find("div", {'id':'mw-pages'})   
+
+                    for link in div.find_all('a'):
+                        orig_links_list.append(link['href'])
+                        orig_names_list.append(link['title'])
+
+                else: 
+                    collection.update_one({'page': page },{"$set":{'list_names': orig_names_list,
+                                                                    'list_name_links': orig_links_list,
+                                                                    'last_page' : 'last_page'}})
+                    last_page = True
         except:
-            collection.update_one({'page': page },{"$set":{'next_page': 'only page'}})
-            print(f"{page}: I'm the only page")
-    
+            print(f"{page}: something went wrong")
     return None
-
 
 # def subcat_html_to_collection(collection, page):
     
@@ -175,7 +222,7 @@ def count_gendered_words(collection, person):
         str_body_text = doc['body_text']
         str_body_text_2 = str(str_body_text).lower()
         
-        years = re.findall('\d\d\d\dD?', str_body_text)
+        #years = re.findall('\d\d\d\dD?', str_body_text)
         list_words_in_body = str_body_text_2.split(' ')
         dct_word_counter = Counter(list_words_in_body)
         
@@ -187,7 +234,6 @@ def count_gendered_words(collection, person):
                                                         'count_male_words': count_male_words,
                                                         'count_nonbinary_words': count_nonbinary_words,
                                                         'len_page': len(list_words_in_body),
-                                                        'years': years,
                                                         'word_dict': dct_word_counter}})
 
     return None
@@ -222,7 +268,7 @@ def people_html_to_collection(col_from, page, col_to):
                 print(f"{page}: oops body text")
 
     except:
-        print(f"{page}: no names" )
+        print(f"{page}: oops... not sure" )
     return None
 
 

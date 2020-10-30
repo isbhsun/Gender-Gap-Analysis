@@ -47,33 +47,30 @@ After cleaning the created dataset, I was left with 17,782 individuals
     - Physics - 20th Century Physicists, and 21st Century Physicists
     - Physiology - 20th Century Biologists, 21st Century Biologists, Microbiologists, 20th Century Physicians, and 21st Century Physicians
 
-+----+------------------------+-------+-----------------------+---------------------+---------------------+
 |    | Field                  |     N |   Female (proportion) |   Male (proportion) |   Ph.D (proportion) |
-+====+========================+=======+=======================+=====================+=====================+
-|  1 | Data Science           |    63 |                 0.365 |               0.635 |               0.302 |
-+----+------------------------+-------+-----------------------+---------------------+---------------------+
-|  0 | Chemistry              |  1659 |                 0.234 |               0.766 |               0.429 |
-+----+------------------------+-------+-----------------------+---------------------+---------------------+
-|  2 | Economics              |  2576 |                 0.145 |               0.855 |               0.395 |
-+----+------------------------+-------+-----------------------+---------------------+---------------------+
-|  3 | Physics                |  2837 |                 0.159 |               0.841 |               0.417 |
-+----+------------------------+-------+-----------------------+---------------------+---------------------+
-|  4 | Physiology or Medicine | 10647 |                 0.232 |               0.768 |               0.139 |
-+----+------------------------+-------+-----------------------+---------------------+---------------------+
+|----|------------------------|-------|-----------------------|---------------------|---------------------|
+|   | Data Science           |    63 |                 0.365 |               0.635 |               0.302 |
+|   | Chemistry              |  1659 |                 0.234 |               0.766 |               0.429 |
+|   | Economics              |  2576 |                 0.145 |               0.855 |               0.395 |
+|   | Physics                |  2837 |                 0.159 |               0.841 |               0.417 |
+|   | Physiology or Medicine | 10647 |                 0.232 |               0.768 |               0.139 |
 
-# Visualizations
+# Visualizations and Analysis
+
+![alt text](images/PropWomenbyfield.png "Title")
+
+Across all of the fields included in this project, there is a smaller proportion of women in the field than men. Data science has the smallest gender gap and Economics has the greatest gender gap. 
+
 
 ![alt text](images/PropWomenbyCategory.png "Title")
 
+This figure visualizes the proportion of women in a field by Wikipedia category. Unsurprisingly, for fields split between 20th century and 21st century categories, there is a greater gender gap for in 20th century categories than 21st century categories.  
+
+
 ![alt text](images/PropPhD_gender_category.png "Title")
+<sub>** Indicates that the difference between the proportion of men and women holding PhDs is different than 0. </sub>
 
-# Analysis 
-
-
-
-
-# Conclusion 
-
+This figure represents the proportion of women holding PhDs and the proportion of men holding PhDs. In almost every category where there is a greater proportion of women holding PhDs than men, the difference is statistically significantly greater than 0 (the exception being 21st century biologists). Plainly said, in each category, the proportion of women holding a PhD is at least equal (if not greater than) the proportion of men holding a PhD. 
 
 
 
