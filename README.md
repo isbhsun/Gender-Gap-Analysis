@@ -11,6 +11,8 @@ It is important to acknowledge that there are more than two genders. Due to data
  
 ## Creating the Dataset
 
+![alt text](images/Wiki_Scrape.png "Title")
+
 To acquire this data, I scraped wikipedia pages to create a novel dataset. Using the Requests library and BeautifulSoup, I grabbed the profiles of individuals listed under relevant categories and saved the information into a Mongo database. I chose to focus on categories relevant to the Nobel Prize fields (i.e. physics, chemistry, physiology or medicine, literature, peace, and economics), then narrowed it down to economics and STEM fields. I excluded literature categories because the categories were too vast for the time constraints of this project. I similarly excluded the peace category because winners of the peace category generally come from a broad range of fields making it difficult to categorize. Data scientists is the one non-Nobel category included out of personal interest.  
 
 The origin categories I chose were:
@@ -33,7 +35,7 @@ Once I scraped the names and links of individuals under each category and subcat
 
 
 ## Data Description 
-After cleaning the created dataset, I was left with 17,782 individuals
+After cleaning the created dataset by removing irrelevant categories (e.g. Cultural Depictions of Marie Curie) and profiles that were not people (e.g. Alteryx), I was left with **17,782** individuals
 
 
 ### Key Variables
@@ -67,10 +69,10 @@ Across all of the fields included in this project, there is a smaller proportion
 This figure visualizes the proportion of women in a field by Wikipedia category. Unsurprisingly, for fields split between 20th century and 21st century categories, there is a greater gender gap for in 20th century categories than 21st century categories.  
 
 
-![alt text](images/PropPhD_gender_category.png "Title")
+![alt text](images/PropPhD_gender_field.png "Title")
 <sub>** Indicates that the difference between the proportion of men and women holding PhDs is different than 0. </sub>
 
-This figure represents the proportion of women holding PhDs and the proportion of men holding PhDs. In almost every category where there is a greater proportion of women holding PhDs than men, the difference is statistically significantly greater than 0 (the exception being 21st century biologists). Plainly said, in each category, the proportion of women holding a PhD is at least equal (if not greater than) the proportion of men holding a PhD. 
+This figure represents the proportion of women holding PhDs and the proportion of men holding PhDs. In every category where the proprtion of men holding PhDs is greater than the proportion of women holding PhDs, we would not be able to reject the null hypothesis that the difference in means is greater than 0. However, in the case of chemistry and physiology, where the proportion of women holding PhDs is greater than the proportion of men holding PhDs, the difference in means lies beyond the 95% confidence interval. This suggests that in all of these fields, women are just as, if not more qualified than men. 
 
 
 
