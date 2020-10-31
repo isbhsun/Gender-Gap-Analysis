@@ -1,10 +1,13 @@
+# BEFORE RUNNING THIS SCRIPT! Be aware that it takes a very long time to scrape all of the pages. 
+# The output from this code is saved in the data folder.  
+
+
 import requests
 from pymongo import MongoClient
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
 
-#set up Mongo to store data 
 client = MongoClient('localhost', 27017)
 
 db = client['cap1_db']

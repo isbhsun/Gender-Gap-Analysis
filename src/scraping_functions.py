@@ -80,37 +80,6 @@ def find_subcategories(collection, page):
     return None
         
 
-
-# def find_next_page(collection, page):
-    
-#     doc = collection.find_one({'page': page })
-    
-#     try:
-#         doc['next_page']
-#         print(f"{page}: next page already here!")
-    
-#     except:
-#         try:
-#             soup = BeautifulSoup(doc['html'] ,'html.parser')
-#             div = soup.find("div", {'id':'mw-pages'})   
-
-#             links = []
-#             for link in div.find_all('a'):
-#                 links.append(link['href'])
-
-#             last_link = links.pop()
-#             if 'pagefrom' in last_link:
-#                 collection.update_one({'page': page },{"$set":{'next_page': last_link}})
-#                 print(f"{page}:I grabbed the next page")
-#             else:
-#                 print(f"{page}:I'm already the last page")    
-        
-#         except:
-#             collection.update_one({'page': page },{"$set":{'next_page': 'only page'}})
-#             print(f"{page}: I'm the only page")
-    
-#     return None
-
 def names_on_next_page(collection, page):
 
     doc = collection.find_one({'page':page})
@@ -158,33 +127,6 @@ def names_on_next_page(collection, page):
         except:
             print(f"{page}: something went wrong")
     return None
-
-# def subcat_html_to_collection(collection, page):
-    
-#     doc = collection.find_one({'page': page })
-    
-#     try: 
-#         subcat_link = doc['subcat_link']
-#         wik = 'https://en.wikipedia.org/'
-
-#         for i in subcat_link:
-#             url = wik + i
-#             r = requests.get(url)
-#             subcat_page = i.replace('/wiki/Category:', '')
-
-#             if subcat_page in subcategory_url:
-#                 print(f"{subcat_page}: subcategory html already here")
-#             elif subcat_page not in subcategory_url:
-#                 subcategory_url.add(subcat_page)
-#                 collection.insert_one({'page': subcat_page, 
-#                                'html':r.content})
-#                 print(f"{subcat_page}: I saved the subcat html")
-
-#     except:
-#         print(f"{page} I don't have subcategories or they are already added")
-    
-#     return None
-
 
 
 def write_subcategories_to_set(collection, subcategory_set):
@@ -301,3 +243,59 @@ def just_body_text(collection, person):
         collection.update_one({'page': person },{"$set":{'body_text': body_text,
                                                         'doctorate': doctorate}})
     return None
+
+
+if __name__ == "__main__":
+
+    client = MongoClient('localhost', 27017)
+
+    db = client['scrape_test_db']
+    categories_col = db['categories_col']
+    people_col = db['people_col']
+
+    # save html to doc
+    html_to_collection(categories_col, 'Data_scientists')
+    #add list of names and links to doc
+    people_to_collection(categories_col, 'Data_scientists')
+    #add list of subcategories to doc
+    find_subcategories(categories_col, 'Data_scientists')
+    #grab list of names from the next page if there is one
+    names_on_next_page(categories_col, 'Data_scientists')
+
+    subcategory_url = set()
+    write_subcategories_to_set(categories_col, subcategory_url)
+
+    for i in subcategory_url: 
+        # save html to doc
+        html_to_collection(categories_col, i)
+        #add list of names and links to doc
+        people_to_collection(categories_col, i)
+        #add list of subcategories to doc
+        find_subcategories(categories_col, i)
+        #grab list of names from the next page if there is one
+        names_on_next_page(categories_col, i)
+        
+    list_all_pages = []
+    for doc in col1.find():
+        page = doc['page']
+        list_all_pages.append(page)
+
+    print(f"There are {len(list_all_pages)} documents")
+
+
+    progress = 0
+    for page in list_all_pages:
+        progress += 1
+        print(f"{progress}: {page}")
+        people_html_to_collection(categories_col, page, people_col)
+
+
+    progress = 0
+    hundred = 0
+    for person in list_all_people:
+        progress +=1 
+        count_gendered_words(col_people, person)
+        if progress == 100:
+            hundred += 1
+            print(f"{hundred}: {person}: another 100" )
+            progress = 0

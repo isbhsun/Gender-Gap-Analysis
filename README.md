@@ -2,6 +2,8 @@
 
 The goal of this project is to measure the gender gap in various fields using scraped data from wikipedia. 
 
+This study of Wikipedia profiles cannot be generalized to the larger population of 
+
 Rather than measuring the proportion of women in a field, this analysis looks specifically at individuals at the top of their field, the assumption being that individuals with a wikipedia page are somewhat notable figures. 
 
 It is important to acknowledge that there are more than two genders. Due to data constraints, for this project, I examine the difference between only men and women in a field. 
@@ -13,7 +15,7 @@ It is important to acknowledge that there are more than two genders. Due to data
 
 ![alt text](images/Wiki_Scrape.png "Title")
 
-To acquire this data, I scraped wikipedia pages to create a novel dataset. Using the Requests library and BeautifulSoup, I grabbed the profiles of individuals listed under relevant categories and saved the information into a Mongo database. I chose to focus on categories relevant to the Nobel Prize fields (i.e. physics, chemistry, physiology or medicine, literature, peace, and economics), then narrowed it down to economics and STEM fields. I excluded literature categories because the categories were too vast for the time constraints of this project. I similarly excluded the peace category because winners of the peace category generally come from a broad range of fields making it difficult to categorize. Data scientists is the one non-Nobel category included out of personal interest.  
+To acquire this data, I scraped wikipedia pages to create a novel dataset. Using the `Requests` library and `BeautifulSoup`, I grabbed the profiles of individuals listed under relevant categories and saved the information into a `Mongo` database. I chose to focus on categories relevant to the Nobel Prize fields (i.e. physics, chemistry, physiology or medicine, literature, peace, and economics), then narrowed it down to economics and STEM fields. I excluded literature categories because the categories were too vast for the time constraints of this project. I similarly excluded the peace category because winners of the peace category generally come from a broad range of fields making it difficult to categorize. Data scientists is the one non-Nobel category included out of personal interest.  
 
 The origin categories I chose were:
 - [Data Scientists](https://en.wikipedia.org/wiki/Category:Data_scientists)
@@ -49,29 +51,35 @@ After cleaning the created dataset by removing irrelevant categories (e.g. Cultu
     - Physics - 20th Century Physicists, and 21st Century Physicists
     - Physiology - 20th Century Biologists, 21st Century Biologists, Microbiologists, 20th Century Physicians, and 21st Century Physicians
 
-|    | Field                  |     N |   Female (proportion) |   Male (proportion) |   Ph.D (proportion) |
-|----|------------------------|-------|-----------------------|---------------------|---------------------|
-|   | Data Science           |    63 |                 0.365 |               0.635 |               0.302 |
-|   | Chemistry              |  1659 |                 0.234 |               0.766 |               0.429 |
-|   | Economics              |  2576 |                 0.145 |               0.855 |               0.395 |
-|   | Physics                |  2837 |                 0.159 |               0.841 |               0.417 |
-|   | Physiology or Medicine | 10647 |                 0.232 |               0.768 |               0.139 |
+
+
+
+### Table 1. Summary Statistics
+|    | Field                  |     N |   Female (proportion) |   Ph.D (proportion) |
+|----|------------------------|-------|-----------------------|---------------------|
+|   | Data Science           |    63 |                 0.365 |               0.302 |
+|   | Chemistry              |  1659 |                 0.234 |               0.429 |
+|   | Economics              |  2576 |                 0.145 |               0.395 |
+|   | Physics                |  2837 |                 0.159 |               0.417 |
+|   | Physiology or Medicine | 10647 |                 0.232 |               0.139 |
 
 # Visualizations and Analysis
 
+### Figure 1. 
 ![alt text](images/PropWomenbyfield.png "Title")
 
 Across all of the fields included in this project, there is a smaller proportion of women in the field than men. Data science has the smallest gender gap and Economics has the greatest gender gap. 
+ 
 
-
+### Figure 2.
 ![alt text](images/PropWomenbyCategory.png "Title")
 
 This figure visualizes the proportion of women in a field by Wikipedia category. Unsurprisingly, for fields split between 20th century and 21st century categories, there is a greater gender gap for in 20th century categories than 21st century categories.  
 
-
+### Figure 3. 
 ![alt text](images/PropPhD_gender_field.png "Title")
 
-This figure represents the proportion of women holding PhDs and the proportion of men holding PhDs. In every category where the proprtion of men holding PhDs is greater than the proportion of women holding PhDs, we would not be able to reject the null hypothesis that the difference in means is greater than 0. However, in the case of chemistry and physiology, where the proportion of women holding PhDs is greater than the proportion of men holding PhDs, the difference in means lies beyond the 95% confidence interval. This suggests that in all of these fields, women are just as, if not more qualified than men. 
+This figure represents the proportion of women holding PhDs and the proportion of men holding PhDs. In every category where the proportion of men holding PhDs is greater than the proportion of women holding PhDs, we would not be able to reject the null hypothesis that the difference in means is greater than 0. However, in the case of chemistry and physiology, where the proportion of women holding PhDs is greater than the proportion of men holding PhDs, the difference in means lies beyond the 95% confidence interval. This suggests that the proportion of women with PhDs is at least equal to, if not greater than the proportion of men with PhDs in each field. 
 
 
 
