@@ -1,6 +1,8 @@
 # BEFORE RUNNING THIS SCRIPT! Be aware that it takes a very long time to scrape all of the pages. 
 # The output from this code is saved in the data folder.  
 
+#set directory
+file_path = '/Users/isabella/gal/capstone/Gender-Gap-Analysis/'
 
 import requests
 from pymongo import MongoClient
@@ -9,7 +11,6 @@ import pandas as pd
 import numpy as np
 
 client = MongoClient('localhost', 27017)
-
 db = client['cap1_db']
 col1 = db['col1']
 col_people = db['col_people']
@@ -104,7 +105,7 @@ for doc in col1.find():
 print(f"There are {len(list_all_pages)} documents")
 
 
-#People to new collection
+#Write people to new collection
 progress = 0
 for page in list_all_pages:
     progress += 1
@@ -134,9 +135,9 @@ for person in list_all_people:
 num_ppl = 0 
 for doc in col_people.find():
     num_ppl +=1
-    
-num_ppl
+
 
 df = pd.DataFrame(col_people.find())
 df_tocsv = df[['page', 'field', 'count_female_words', 'count_male_words', 'count_nonbinary_words', 'doctorate', 'len_page']]
-df_tocsv.to_csv('data/wiki_profile.csv')
+
+df_tocsv.to_csv(file_path+'data/wiki_profile.csv')
