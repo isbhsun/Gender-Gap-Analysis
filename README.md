@@ -1,17 +1,13 @@
 # Introduction
 
-The goal of this project is to measure the gender gap in various fields using scraped data from wikipedia. 
-
-This study of Wikipedia profiles cannot be generalized to the larger population of 
-
-Rather than measuring the proportion of women in a field, this analysis looks specifically at individuals at the top of their field, the assumption being that individuals with a wikipedia page are somewhat notable figures. 
+The goal of this project is to measure the gender gap between men and women in various fields using scraped data from wikipedia. 
 
 It is important to acknowledge that there are more than two genders. Due to data constraints, for this project, I examine the difference between only men and women in a field. 
 
 
 # Data
  
-## Creating the Dataset
+## Creating the Dataset <sup>[1](#foot1)</sup>
 
 ![alt text](images/Wiki_Scrape.png "Title")
 
@@ -42,8 +38,8 @@ After cleaning the created dataset by removing irrelevant categories (e.g. Cultu
 
 ### Key Variables
 
-- **Gender**: To determine the gender of an individual, I counted the number of times gendered words appeared on their page. For female, I used "she", "her", and "hers". For male, I used "he", "him", and "his". The gender of the individual was constructed by which count was greater. <sup>[1](#foot1)</sup>
-- **Ph.D.**: An individual is considered to have a Ph.D. if the word "Ph.D." appeared at least once in their profile. 
+- **Gender**: To determine the gender of an individual, I counted the number of times gendered words appeared on their page. For female, I used "she", "her", and "hers". For male, I used "he", "him", and "his". Which count was greater determined the gender of the individual in the dataset. <sup>[2](#foot2)</sup>
+- **Ph.D.**: An individual is considered to have a Ph.D. if the word "Ph.D." appeared at least once in their profile. <sup>[3](#foot3)</sup>
 - **Field**: The various origin categories were further organized into broader fields. 
     - Data Science - Data Scientists
     - Chemistry - 20th Century Chemists, and 21st Century Chemists
@@ -65,23 +61,65 @@ After cleaning the created dataset by removing irrelevant categories (e.g. Cultu
 
 # Visualizations and Analysis
 
-### Figure 1. 
+
 ![alt text](images/PropWomenbyfield.png "Title")
 
-Across all of the fields included in this project, there is a smaller proportion of women in the field than men. Data science has the smallest gender gap and Economics has the greatest gender gap. 
- 
+This figure represents the proportion of women in each field. The bars are the 95% confidence interval. Across all of the fields included in this project, there is a smaller proportion of women in the field than men. Data science appears to have the largest proportion that are women but due to the smaller sample size (N = 63), it also has a large standard error. Out of the fields included, Economics and Physics have the smallest proportion of women. 
 
-### Figure 2.
+These results are not surprising given that data science is a relatively new field. To further explore this hypothesis, I compared the proportion of profile that were female in the wikipedia categories that could be split between the 20th century and 21st century. 
+
 ![alt text](images/PropWomenbyCategory.png "Title")
 
-This figure visualizes the proportion of women in a field by Wikipedia category. Unsurprisingly, for fields split between 20th century and 21st century categories, there is a greater gender gap for in 20th century categories than 21st century categories.  
+Unsurprisingly, for fields split between 20th century and 21st century categories, there is a significantly greater gender gap in the 20th century group. I use a bayes test to calculate the percent likelihood that the proportion of women in a field is greater in the 21st century than the 20th century. Visualizations of the bayes tests are below. 
 
-### Figure 3. 
+![alt text](images/physicists_bayes.png "Title")
+
+![alt text](images/physicians_bayes.png "Title")
+
+![alt text](images/economists_bayes.png "Title")
+
+![alt text](images/chemists_bayes.png "Title")
+
+![alt text](images/biologists_bayes.png "Title")
+
+
+For every field except for physicists, the percent likelihood that the proportion of women is higher in the 21st century than the 20th century is 100%. For physicists, the percent likelihood that the proportion of women is greater in the 21st century than in the 20th century is 99.85%. 
+
+
+
 ![alt text](images/PropPhD_gender_field.png "Title")
 
-This figure represents the proportion of women holding PhDs and the proportion of men holding PhDs. In every category where the proportion of men holding PhDs is greater than the proportion of women holding PhDs, we would not be able to reject the null hypothesis that the difference in means is greater than 0. However, in the case of chemistry and physiology, where the proportion of women holding PhDs is greater than the proportion of men holding PhDs, the difference in means lies beyond the 95% confidence interval. This suggests that the proportion of women with PhDs is at least equal to, if not greater than the proportion of men with PhDs in each field. 
+This figure represents the proportion of women holding PhDs and the proportion of men holding PhDs. In every category where the proportion of men holding PhDs is greater than the proportion of women holding PhDs, we would not be able to reject the null hypothesis that the difference in means is greater than 0. However, in the case of chemistry and physiology, where the proportion of women holding PhDs is greater than the proportion of men holding PhDs, the difference in means lies beyond the 95% confidence interval. 
+
+Once again, I use the bayes test to calculate the percent likelihood that the proportion of people holding a PhD is greater amongst one gender over another. 
 
 
+![alt text](images/Physics_phd_bayes.png "Title")
 
+The percent likelihood that the proportion of males with PhDs is greater than females with PhDs among the profiles in the physics field is 75.88%.
 
-<a name="foot1">[1]</a>  I also counted the instances of occurrences of nonbinary pronouns: "they", "them", "theirs", "ze", "zir", "hir". However, I was unable to determine that any of the profiles were of nonbinary gendered individuals. Closer inspection of profiles where instances of nonbinary words were greater than male of female words revealed that in the case of this data, it was common that "they" and "them" were used frequently for profiles of individuals who worked collaboratively with others. 
+![alt text](images/Chemistry_phd_bayes.png "Title")
+
+The percent likelihood that the proportion of females with PhDs is greater than males with PhDs among the profiles in the chemistry field is 99.57%. 
+
+![alt text](images/Economics_phd_bayes.png "Title")
+
+The percent likelihood that the proportion of females with PhDs is greater than males with PhDs among the profiles in the economics field is 64.76%.
+
+![alt text](images/Data_Science_phd_bayes.png "Title")
+
+The percent likelihood that the proportion of males with PhDs is greater than females with PhDs among the profiles in the data science field is 94.89%.
+
+![alt text](images/Physiology_or_Medicine_phd_bayes.png "Title")
+
+The percent likelihood that the proportion of females with PhDs is greater than males with PhDs among the profiles in the physiology or medicine fields is 100%. 
+
+_________________________________________________________
+<a name="foot1">[1]</a> I scraped Wikipedia on October 29, 2020. As a website that is constantly changing, the data scraped from their site will also change. The data used for analysis here is available in [csv form in the data folder](https://github.com/isbhsun/Gender-Gap-Analysis/blob/master/data/wiki_profile.csv) of this repository, and the code used to scrape this data is available in the [src folder](https://github.com/isbhsun/Gender-Gap-Analysis/tree/master/src) of this repository.
+
+<a name="foot2">[2]</a>  I also counted the instances of occurrences of nonbinary pronouns: "they", "them", "theirs", "ze", "zir", "hir". However, I was unable to determine that any of the profiles were of nonbinary gendered individuals. Closer inspection of profiles where instances of nonbinary words were greater than male of female words revealed that in the case of this data, it was common that "they" and "them" were used frequently for profiles of individuals who worked collaboratively with others. 
+
+<a name="foot3">[3]</a>  It is very likely that this method of determining whether an individual has a PhD or not is not always accurate. 
+
+____________________________________________________
+Feedback and constructive criticism is always welcome! If you have any comments, questions, suggestions, ideas, or simply any interest in discussing the topics in this project, feel free to email isbhsun@gmail.com.
