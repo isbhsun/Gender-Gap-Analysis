@@ -86,34 +86,6 @@ Unsurprisingly, for fields split between 20th century and 21st century categorie
 For every field except for physicists, the percent likelihood that the proportion of women is higher in the 21st century than the 20th century is 100%. For physicists, the percent likelihood that the proportion of women is greater in the 21st century than in the 20th century is 99.85%. 
 
 
-
-![alt text](images/PropPhD_gender_field.png "Title")
-
-This figure represents the proportion of women holding PhDs and the proportion of men holding PhDs. In every category where the proportion of men holding PhDs is greater than the proportion of women holding PhDs, we would not be able to reject the null hypothesis that the difference in means is greater than 0. However, in the case of chemistry and physiology, where the proportion of women holding PhDs is greater than the proportion of men holding PhDs, the difference in means lies beyond the 95% confidence interval. 
-
-Once again, I use the bayes test to calculate the percent likelihood that the proportion of people holding a PhD is greater amongst one gender over another. 
-
-
-![alt text](images/Physics_phd_bayes.png "Title")
-
-The percent likelihood that the proportion of males with PhDs is greater than females with PhDs among the profiles in the physics field is 75.88%.
-
-![alt text](images/Chemistry_phd_bayes.png "Title")
-
-The percent likelihood that the proportion of females with PhDs is greater than males with PhDs among the profiles in the chemistry field is 99.57%. 
-
-![alt text](images/Economics_phd_bayes.png "Title")
-
-The percent likelihood that the proportion of females with PhDs is greater than males with PhDs among the profiles in the economics field is 64.76%.
-
-![alt text](images/Data_Science_phd_bayes.png "Title")
-
-The percent likelihood that the proportion of males with PhDs is greater than females with PhDs among the profiles in the data science field is 94.89%.
-
-![alt text](images/Physiology_or_Medicine_phd_bayes.png "Title")
-
-The percent likelihood that the proportion of females with PhDs is greater than males with PhDs among the profiles in the physiology or medicine fields is 100%. 
-
 _________________________________________________________
 <a name="foot1">[1]</a> I scraped Wikipedia on October 29, 2020. As a website that is constantly changing, the data scraped from their site will also change. The data used for analysis here is available in [csv form in the data folder](https://github.com/isbhsun/Gender-Gap-Analysis/blob/master/data/wiki_profile.csv) of this repository, and the code used to scrape this data is available in the [src folder](https://github.com/isbhsun/Gender-Gap-Analysis/tree/master/src) of this repository.
 
