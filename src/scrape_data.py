@@ -1,14 +1,15 @@
-# BEFORE RUNNING THIS SCRIPT! Be aware that it takes a very long time to scrape all of the pages. 
-# The output from this code is saved in the data folder.  
-
-#set directory
-file_path = '/Users/isabella/gal/capstone/Gender-Gap-Analysis/'
-
 import requests
 from pymongo import MongoClient
 from bs4 import BeautifulSoup
 import pandas as pd
 import numpy as np
+
+#  BEFORE RUNNING THIS SCRIPT!
+#  Be aware that it takes a very long time to scrape all of the pages.
+#  The output from this code is saved in the data folder.
+
+#  set directory
+file_path = '/Users/isabella/gal/capstone/Gender-Gap-Analysis/'
 
 client = MongoClient('localhost', 27017)
 db = client['cap1_db']
@@ -17,10 +18,10 @@ col_people = db['col_people']
 
 %run scraping_functions.py
 
-category_url = ['Data_scientists', 
+category_url = ['Data_scientists',
                 '20th-century_economists',
-                '21st-century_economists', 
-                '21st-century_chemists', 
+                '21st-century_economists',
+                '21st-century_chemists',
                 '20th-century_chemists',
                 '21st-century_physicists',
                 '20th-century_physicists',
@@ -30,47 +31,41 @@ category_url = ['Data_scientists',
                 '21st-century_physicians',
                 '20th-century_physicians']
 
-
-for i in category_url: 
-    # save html to doc
+for i in category_url:
+    #  save html to doc
     html_to_collection(col1, i)
-    #add list of names and links to doc
+    #  add list of names and links to doc
     people_to_collection(col1, i)
-    #add list of subcategories to doc
+    #  add list of subcategories to doc
     find_subcategories(col1, i)
-    #grab list of names from the next page if there is one
+    #  grab list of names from the next page if there is one
     names_on_next_page(col1, i)
 
-
-
-# Subcategories 
+#  Subcategories
 subcategory_url = set()
 write_subcategories_to_set(col1, subcategory_url)
-
 subcategory_old = set()
 subcat_rounds = 0
 
-while subcat_rounds < 2: 
+while subcat_rounds < 2:
 
     only_new_subcats = subcategory_url.difference(subcategory_old)
-    
-    for i in only_new_subcats: 
-        # save html to doc
+
+    for i in only_new_subcats:
+        #  save html to doc
         html_to_collection(col1, i)
-        #add list of names and links to doc
+        #  add list of names and links to doc
         people_to_collection(col1, i)
-        #add list of subcategories to doc
+        #  add list of subcategories to doc
         find_subcategories(col1, i)
-        #grab list of names from the next page if there is one
+        #  grab list of names from the next page if there is one
         names_on_next_page(col1, i)
-        
+
     subcategory_old.update(only_new_subcats)
     write_subcategories_to_set(col1, subcategory_url)
-            
-    subcat_rounds +=1
+    subcat_rounds += 1
 
-
-#Clean weird subcategories 
+#  Clean weird subcategories
 col1.delete_many({"page": {"$regex": 'Taxa?'}})
 col1.delete_many({"page": {"$regex": 'Books?'}})
 col1.delete_many({"page": {"$regex": 'Fictional?'}})
@@ -95,49 +90,45 @@ col1.delete_many({"page": 'Manmohan_Singh'})
 col1.delete_many({"page": 'E._M._Forster'})
 col1.delete_many({"page": 'John_Maynard_Keynes'})
 
-
-
 list_all_pages = []
 for doc in col1.find():
     page = doc['page']
     list_all_pages.append(page)
-
 print(f"There are {len(list_all_pages)} documents")
 
-
-#Write people to new collection
+#  Write people to new collection
 progress = 0
 for page in list_all_pages:
     progress += 1
     print(f"{progress}: {page}")
     people_html_to_collection(col1, page, col_people)
 
-
 list_all_people = []
 for doc in col_people.find():
     page = doc['page']
     list_all_people.append(page)
-
 print(f"There are {len(list_all_people)} people")
-
 
 progress = 0
 hundred = 0
 for person in list_all_people:
-    progress +=1 
+    progress += 1
     count_gendered_words(col_people, person)
     if progress == 100:
         hundred += 1
-        print(f"{hundred}: {person}: another 100" )
+        print(f"{hundred}: {person}: another 100")
         progress = 0
 
-
-num_ppl = 0 
+num_ppl = 0
 for doc in col_people.find():
-    num_ppl +=1
-
+    num_ppl += 1
 
 df = pd.DataFrame(col_people.find())
-df_tocsv = df[['page', 'field', 'count_female_words', 'count_male_words', 'count_nonbinary_words', 'doctorate', 'len_page']]
-
-df_tocsv.to_csv(file_path+'data/wiki_profile.csv')
+df_tocsv = df[['page',
+               'field',
+               'count_female_words',
+               'count_male_words',
+               'count_nonbinary_words',
+               'doctorate',
+               'len_page']]
+df_tocsv.to_csv(file_path + 'data/wiki_profile.csv')
